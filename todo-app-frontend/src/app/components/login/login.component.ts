@@ -5,12 +5,12 @@ import { ServicoAutenticacao } from '../../services/autenticacao.service';
 import { ServicoToast } from '../../services/toast.service';
 
 @Component({
-  selector: 'app-cadastro',
-  templateUrl: './cadastro.component.html',
-  styleUrls: ['./cadastro.component.css']
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css']
 })
-export class ComponenteCadastro {
-  formularioCadastro: FormGroup;
+export class ComponenteLogin {
+  formularioLogin: FormGroup;
   carregando = false;
 
   constructor(
@@ -19,32 +19,30 @@ export class ComponenteCadastro {
     private roteador: Router,
     private servicoToast: ServicoToast
   ) {
-    this.formularioCadastro = this.construtorFormulario.group({
-      nome: ['', [Validators.required, Validators.minLength(3)]],
+    this.formularioLogin = this.construtorFormulario.group({
       email: ['', [Validators.required, Validators.email]],
       senha: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 
   aoEnviar(): void {
-    if (this.formularioCadastro.valid) {
+    if (this.formularioLogin.valid) {
       this.carregando = true;
 
-      this.servicoAutenticacao.cadastrar(this.formularioCadastro.value).subscribe({
+      this.servicoAutenticacao.autenticar(this.formularioLogin.value).subscribe({
         next: (resposta) => {
-          this.servicoToast.sucesso('Cadastro realizado com sucesso!');
+          this.servicoToast.sucesso('Login realizado com sucesso!');
           this.roteador.navigate(['/tarefas']);
         },
         error: (erro) => {
           this.carregando = false;
-          const mensagemErro = erro.error?.erro || 'Erro ao cadastrar usuário';
+          const mensagemErro = erro.error?.erro || 'Erro ao realizar login';
           this.servicoToast.erro(mensagemErro);
         }
       });
     }
   }
 
-  get nome() { return this.formularioCadastro.get('nome'); }
-  get email() { return this.formularioCadastro.get('email'); }
-  get senha() { return this.formularioCadastro.get('senha'); }
+  get email() { return this.formularioLogin.get('email'); }
+  get senha() { return this.formularioLogin.get('senha'); }
 }

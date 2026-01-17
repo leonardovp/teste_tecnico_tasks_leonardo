@@ -1,0 +1,85 @@
+<div class="container-tarefas">
+  <div class="cabecalho">
+    <h1>Minhas Tarefas</h1>
+    <button class="botao-sair" (click)="deslogar()">Sair</button>
+  </div>
+
+  <div class="formulario-nova-tarefa">
+    <h2>Nova Tarefa</h2>
+    <form [formGroup]="formularioTarefa" (ngSubmit)="criarTarefa()">
+      <div class="grupo-formulario">
+        <label for="descricao">Descrição</label>
+        <input
+          type="text"
+          id="descricao"
+          formControlName="descricao"
+          placeholder="O que precisa ser feito?"
+          [class.invalido]="descricao?.invalid && descricao?.touched"
+        />
+        <div class="erro" *ngIf="descricao?.invalid && descricao?.touched">
+          <span *ngIf="descricao?.errors?.['required']">Descrição é obrigatória</span>
+          <span *ngIf="descricao?.errors?.['minlength']">Descrição deve ter no mínimo 3 caracteres</span>
+        </div>
+      </div>
+
+      <div class="grupo-formulario">
+        <label for="prioridade">Prioridade</label>
+        <select id="prioridade" formControlName="prioridade">
+          <option value="Alta">Alta</option>
+          <option value="Média">Média</option>
+          <option value="Baixa">Baixa</option>
+        </select>
+      </div>
+
+      <button type="submit" [disabled]="formularioTarefa.invalid || carregando" class="botao-adicionar">
+        {{ carregando ? 'Adicionando...' : 'Adicionar Tarefa' }}
+      </button>
+    </form>
+  </div>
+
+  <div class="lista-tarefas">
+    <h2>Tarefas Pendentes ({{ tarefas.length }})</h2>
+
+    <div *ngIf="carregando" class="carregando">
+      Carregando tarefas...
+    </div>
+
+    <div *ngIf="!carregando && tarefas.length === 0" class="vazio">
+      Nenhuma tarefa pendente. Crie uma nova tarefa acima!
+    </div>
+
+    <div *ngFor="let tarefa of tarefas" class="cartao-tarefa">
+      <div class="tarefa-conteudo">
+        <div class="badge-prioridade" [style.background-color]="getCorPrioridade(tarefa.prioridade)">
+          {{ tarefa.prioridade }}
+        </div>
+        <div class="tarefa-info">
+          <p class="tarefa-descricao">{{ tarefa.descricao }}</p>
+          <small class="tarefa-data">{{ tarefa.criado_em | date: 'dd/MM/yyyy HH:mm' }}</small>
+        </div>
+      </div>
+      <div class="tarefa-acoes">
+        <button
+          *ngIf="tarefa.status === 'pendente'"
+          class="botao-concluir"
+          (click)="concluirTarefa(tarefa)"
+          title="Concluir tarefa">
+          ✓
+        </button>
+        <button
+          *ngIf="tarefa.status === 'concluida'"
+          class="botao-reativar"
+          (click)="reativarTarefa(tarefa)"
+          title="Reativar tarefa">
+          ↻
+        </button>
+        <button
+          class="botao-excluir"
+          (click)="excluirTarefa(tarefa)"
+          title="Excluir tarefa">
+          ×
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
